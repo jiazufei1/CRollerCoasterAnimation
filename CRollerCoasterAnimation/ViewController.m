@@ -11,6 +11,8 @@
 @interface ViewController ()
 
 @property (nonatomic, strong) CALayer *groundLayer;
+@property (nonatomic, strong) CALayer *fanLayer;
+@property (nonatomic, strong) CALayer *legLayer;
 
 @property (nonatomic, strong) CAShapeLayer *yellowPath;
 
@@ -38,7 +40,10 @@
     _groundLayer = [self createGroundLayerWithSize:size];
     _yellowPath = [self createYellowPathLayerWithSize:size];
     _greenPath = [self createGreenPathLayerWithSize:size];
+    _legLayer = [self createLegWithSize:size];
+    _fanLayer = [self createFanLayerWithSize:size];
     
+    [self fanCircleAnimation];
     [self addTreeLayeWithSize:size];
     
     [NSTimer scheduledTimerWithTimeInterval:0.092 target:self selector:@selector(startAnimated:) userInfo:nil repeats:YES];
@@ -193,9 +198,44 @@
 {
     CALayer *ground = [CALayer layer];
     ground.frame = CGRectMake(0, size.height - 20, size.width, 20);
-    ground.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"7"]].CGColor;
+    ground.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"ground"]].CGColor;
     [self.view.layer addSublayer:ground];
     return ground;
+}
+
+
+
+-(CALayer*)createFanLayerWithSize:(CGSize)size{
+    CALayer *fan = [CALayer layer];
+    fan.frame = CGRectMake(200, size.height - 300, 100, 100);
+    
+    fan.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"fan1"]].CGColor;
+    [self.view.layer addSublayer:fan];
+    return fan;
+}
+
+//旋转动画
+-(void)fanCircleAnimation{
+    
+    
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+    animation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 ];
+
+    animation.duration = 0.8;
+
+    animation.cumulative = YES;
+
+    animation.repeatCount = ULLONG_MAX;
+    
+    [self.fanLayer addAnimation:animation forKey:animation.keyPath];
+    
+}
+-(CALayer*)createLegWithSize:(CGSize)size{
+    CALayer *leg = [CALayer layer];
+    leg.frame = CGRectMake(250, size.height - 250, 10, 100);
+    leg.backgroundColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"leage"]].CGColor;
+    [self.view.layer addSublayer:leg];
+    return leg;
 }
 
 - (CAShapeLayer *)createYellowPathLayerWithSize:(CGSize)size
@@ -211,7 +251,7 @@
     [path addQuadCurveToPoint:CGPointMake(size.width + 10, size.height / 3) controlPoint:CGPointMake(size.width - 100, 50)];
     [path addLineToPoint:CGPointMake(size.width + 10, size.height + 10)];
     [path addLineToPoint:CGPointMake(0, size.height + 10)];
-    calayer.fillColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"2"]].CGColor;
+    calayer.fillColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"yellow"]].CGColor;
     calayer.path = path.CGPath;
     [self.view.layer insertSublayer:calayer below:_groundLayer];
     
@@ -256,7 +296,7 @@
     [greenPath addQuadCurveToPoint:CGPointMake(size.width / 1.8, size.height - 70) controlPoint:CGPointMake(size.width - 120, 200)];
     [greenPath addCurveToPoint:CGPointMake(0, size.height - 100) controlPoint1:CGPointMake(size.width / 1.8 - 60, size.height - 60) controlPoint2:CGPointMake(150, size.height / 2.3)];
     [greenPath addLineToPoint:CGPointMake(-100, size.height + 10)];
-    greenLayer.fillColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"3"]].CGColor;
+    greenLayer.fillColor = [[UIColor alloc] initWithPatternImage:[UIImage imageNamed:@"green"]].CGColor;
     greenLayer.path = greenPath.CGPath;
     [self.view.layer insertSublayer:greenLayer below:calayer];
     
@@ -277,11 +317,11 @@
     CALayer *carLayer = [CALayer layer];
     carLayer.frame = CGRectMake(0, 0, 17, 11);
     [carLayer setAffineTransform:CGAffineTransformTranslate(carLayer.affineTransform, 0, -7)];
-    carLayer.contents = (__bridge id)[UIImage imageNamed:@"6"].CGImage;
+    carLayer.contents = (__bridge id)[UIImage imageNamed:@"car"].CGImage;
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     animation.path = [_yellowPath path];
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    animation.duration = 3;
+    animation.duration = 6;
     animation.repeatCount = MAXFLOAT;
     animation.autoreverses = NO;
     animation.calculationMode = kCAAnimationCubicPaced;
@@ -296,7 +336,7 @@
 {
     CALayer *carLayer = [CALayer layer];
     carLayer.frame = CGRectMake(0, 0, 17, 11);
-    carLayer.contents = (__bridge id)[UIImage imageNamed:@"1"].CGImage;
+    carLayer.contents = (__bridge id)[UIImage imageNamed:@"otherCar"].CGImage;
     UIBezierPath *path = [[UIBezierPath alloc] init];
     path.lineCapStyle = kCGLineCapRound;
     path.lineJoinStyle = kCGLineJoinRound;
@@ -310,7 +350,7 @@
     CAKeyframeAnimation *animation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     animation.path = path.CGPath;
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    animation.duration = 1;
+    animation.duration = 6;
     animation.repeatCount = MAXFLOAT;
     animation.autoreverses = NO;
     animation.calculationMode = kCAAnimationCubicPaced;
@@ -323,7 +363,7 @@
 - (CALayer *)addCloudAnimationWithSize:(CGSize)size
 {
     CALayer *cloudLayer = [CALayer layer];
-    cloudLayer.contents = (__bridge id)[UIImage imageNamed:@"5"].CGImage;
+    cloudLayer.contents = (__bridge id)[UIImage imageNamed:@"cloud"].CGImage;
     cloudLayer.frame = CGRectMake(0, 0, 63, 20);
     [self.view.layer addSublayer:cloudLayer];
     
@@ -346,25 +386,25 @@
 {
     for (int i = 0; i < 7; i ++) {
         CALayer *treeOne = [CALayer layer];
-        treeOne.contents = (__bridge id)[UIImage imageNamed:@"4"].CGImage;
+        treeOne.contents = (__bridge id)[UIImage imageNamed:@"tree"].CGImage;
         treeOne.frame = CGRectMake([@[@5,@55,@70,@(size.width / 3 + 15),@(size.width / 3 + 25), @(size.width - 130),@(size.width - 160)][i] floatValue], size.height - 43, 13, 23);
         [self.view.layer addSublayer:treeOne];
     }
     for (int i = 0; i < 4; i ++) {
         CALayer *treeOne = [CALayer layer];
-        treeOne.contents = (__bridge id)[UIImage imageNamed:@"4"].CGImage;
+        treeOne.contents = (__bridge id)[UIImage imageNamed:@"tree"].CGImage;
         treeOne.frame = CGRectMake([@[@10,@60,@(size.width / 3),@(size.width - 150)][i] floatValue], size.height - 52, 18, 32);
         [self.view.layer addSublayer:treeOne];
     }
     for (int i = 0; i < 2; i ++) {
         CALayer *treeOne = [CALayer layer];
-        treeOne.contents = (__bridge id)[UIImage imageNamed:@"4"].CGImage;
+        treeOne.contents = (__bridge id)[UIImage imageNamed:@"tree"].CGImage;
         treeOne.frame = CGRectMake([@[@(size.width - 210),@(size.width - 50)][i] floatValue], [@[@(size.height - 75),@(size.height - 80)][i] floatValue], 18, 32);
         [self.view.layer addSublayer:treeOne];
     }
     for (int i = 0; i < 3; i ++) {
         CALayer *treeOne = [CALayer layer];
-        treeOne.contents = (__bridge id)[UIImage imageNamed:@"4"].CGImage;
+        treeOne.contents = (__bridge id)[UIImage imageNamed:@"tree"].CGImage;
         treeOne.frame = CGRectMake([@[@(size.width - 235),@(size.width - 220), @(size.width - 40)][i] floatValue], [@[@(size.height - 67),@(size.height - 67),@(size.height - 72)][i] floatValue], 13, 23);
         [self.view.layer addSublayer:treeOne];
     }
